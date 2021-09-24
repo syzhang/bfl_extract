@@ -21,5 +21,6 @@ if __name__=="__main__":
     
     # convert
     for f in os.listdir('./subjs'):
-        print(f)
-        _ = convert_eid(df_bridge, f, save=True)
+        if f.endswith('.csv'):
+            print(f)
+            _ = convert_eid(df_bridge, f, save=True)

@@ -10,11 +10,18 @@ import nibabel as nib
 def extract_nii(m_name, sj_csv, n_sj=2):
     all_m = []
     curr_dir = '/well/seymour/users/uhu195/python/extract_npy'
-
+    data_dir = '/well/win-biobank/projects/imaging/data/data3/subjectsAll'
+    
     dff = pd.read_csv(os.path.join(curr_dir, 'bmrc_full', sj_csv))
 
     if n_sj is None:
         n_sj = dff.shape[0]
+        print(n_sj)
+        
+    # load mask
+    f_path = os.path.join(data_dir, '2'+str(dff['eid'].iloc[0]), m_name)
+    img_tmp = nib.load(f_path).get_fdata()
+    mask_dat = load_mask(img_tmp)
         
     if m_name != 'fMRI/rfMRI_25.dr/dr_stage2.nii.gz':
         for sj in dff['eid'].iloc[:n_sj]:
@@ -22,9 +29,11 @@ def extract_nii(m_name, sj_csv, n_sj=2):
             if os.path.exists(f_path):
                 img = nib.load(f_path)
                 img_dat = img.get_fdata()
-                print(img_dat.shape)
-                img_rav = img_dat.reshape(1,-1)
-    #             print(img_rav.shape)
+#                 print(img_dat.shape)
+                img_masked = img_dat[mask_dat]
+#                 print(img_masked.shape)
+                img_rav = img_masked.reshape(1,-1)
+#                 print(img_rav.shape)
                 all_m.append(img_rav)
         all_mr = np.vstack(all_m)
         print(all_mr.shape)
@@ -44,10 +53,30 @@ def extract_nii(m_name, sj_csv, n_sj=2):
     else:
         extract_nii_dr(m_name, sj_csv, n_sj)
     
+def load_mask(img_data):
+    """load mask and return mask"""
+    curr_dir = '/well/seymour/users/uhu195/python/extract_npy'
+    
+    # check image shape
+    img_len = img_data.shape[0]
+    
+    if img_len < 100: 
+        mask_path = os.path.join(curr_dir, 'MNI152_T1_2mm_brain.nii.gz')
+    else:
+        mask_path = os.path.join(curr_dir, 'MNI152_T1_1mm_brain.nii.gz')
+    mask_dat = nib.load(mask_path).get_fdata()>0
+    return mask_dat
+
 def extract_nii_dr(m_name, sj_csv, n_sj):
     curr_dir = '/well/seymour/users/uhu195/python/extract_npy'
-
+    data_dir = '/well/win-biobank/projects/imaging/data/data3/subjectsAll'
+    
     dff = pd.read_csv(os.path.join(curr_dir, 'bmrc_full', sj_csv))
+    
+    # load mask
+    f_path = os.path.join(data_dir, '2'+str(dff['eid'].iloc[0]), m_name)
+    img_tmp = nib.load(f_path).get_fdata()
+    mask_dat = load_mask(img_tmp)
 
     if m_name == 'fMRI/rfMRI_25.dr/dr_stage2.nii.gz':
         for i in range(25):
@@ -56,9 +85,13 @@ def extract_nii_dr(m_name, sj_csv, n_sj):
                 f_path = os.path.join(data_dir, '2'+str(sj), m_name)
                 if os.path.exists(f_path):
                     img = nib.load(f_path)
-                    img_dat = img.get_fdata()
+                    img_dat = img.get_fdata()[:,:,:,i]
 #                     print(img_dat.shape)
-                    img_rav = img_dat[:,:,:,i].reshape(1,-1)
+                    img_masked = img_dat[mask_dat]
+#                     print(img_masked.shape)
+                    img_rav = img_masked.reshape(1,-1)
+#                     print(img_rav.shape)
+#                     img_rav = img_dat[:,:,:,i].reshape(1,-1)
 #                     print(img_rav.shape)
                 all_m.append(img_rav)
             all_mr = np.vstack(all_m)
@@ -79,7 +112,8 @@ if __name__=="__main__":
 
     # arg
     mod_num = int(sys.argv[1])
-    sj_num = int(sys.argv[2])
+#     sj_num = int(sys.argv[2])
+    sj_num = None
     
     # modalities
     mods = [
@@ -106,5 +140,10 @@ if __name__=="__main__":
         'fMRI/rfMRI_25.dr/dr_stage2.nii.gz'
     ]
     
-    sj_csv = 'subjs_patients_pain_restricted.csv'
+    ## sj_csv = 'subjs_patients_pain_restricted.csv'
+#     sj_csv = 'subjs_patients_pain_restricted_matched.csv'
+#     sj_csv = 'subjs_patients_pain.csv'
+    ##sj_csv = 'subjs_patients_pain_matched.csv'
+    sj_csv = 'subjs_digestive.csv'
+
     extract_nii(mods[mod_num], sj_csv, n_sj=sj_num)
