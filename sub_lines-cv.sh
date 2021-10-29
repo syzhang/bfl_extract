@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #$ -q short.qc@@short.hga
-#$ -pe shmem 10
+#$ -pe shmem 1
 #$ -o /well/seymour/users/uhu195/python/shoes/
 #$ -e /well/seymour/users/uhu195/python/shoes/
 
@@ -13,12 +13,15 @@ module load Python/3.7.4-GCCcore-8.3.0
 source /well/seymour/users/uhu195/python/extract-py3.7.4-${MODULE_CPU_TYPE}/bin/activate
 
 # continue to use your python venv as normal
-echo "Working on modality $1"
-python /well/seymour/users/uhu195/python/extract_npy/extract_mod.py $1 
+echo "Working on IC number $1"
+# python /well/seymour/users/uhu195/python/extract_npy/compare_paincontrol.py $1 idp
+# python /well/seymour/users/uhu195/python/extract_npy/compare_paincontrol.py $1 qs
+# python /well/seymour/users/uhu195/python/extract_npy/compare_bfl_qsidp.py $1 idp
+python /well/seymour/users/uhu195/python/extract_npy/compare_bfl_qsidp.py $1 qs
 # python /well/seymour/users/uhu195/python/extract_npy/extract_mod.py 0 300
 
 # sub loop
 # for mod_num in {0..20}
 # do
-# qsub extract_npy/sub_lines.sh $mod_num
+# qsub extract_npy/sub_lines-cv.sh $mod_num
 # done

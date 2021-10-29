@@ -4,3 +4,6 @@ bmrc_subjs/
 subjs/
 npy/
 bfl_output/
+qsidp/
+__pycache__/
+subjs_bmrc/

@@ -7,13 +7,19 @@ import pandas as pd
 import nibabel as nib
 
 
-def extract_nii(m_name, sj_csv, n_sj=2):
+def extract_nii(m_name, sj_csv, n_sj=2, save_dir=None):
     all_m = []
     curr_dir = '/well/seymour/users/uhu195/python/extract_npy'
     data_dir = '/well/win-biobank/projects/imaging/data/data3/subjectsAll'
     
     dff = pd.read_csv(os.path.join(curr_dir, 'bmrc_full', sj_csv))
-
+    # save
+    dir_name = sj_csv.split('.')[0]
+    if save_dir is None:
+        save_dir = os.path.join(curr_dir,'npy',dir_name)
+    else:
+        save_dir = os.path.join(save_dir,dir_name)
+        
     if n_sj is None:
         n_sj = dff.shape[0]
         print(n_sj)
@@ -37,9 +43,7 @@ def extract_nii(m_name, sj_csv, n_sj=2):
                 all_m.append(img_rav)
         all_mr = np.vstack(all_m)
         print(all_mr.shape)
-        # save
-        dir_name = sj_csv.split('.')[0]
-        save_dir = os.path.join(curr_dir,'npy',dir_name)
+
         try:
             os.mkdir(save_dir)
         except (FileExistsError):
@@ -51,7 +55,7 @@ def extract_nii(m_name, sj_csv, n_sj=2):
         save_path = os.path.join(save_dir, save_name)
         np.save(save_path, all_mr.astype('float32'))
     else:
-        extract_nii_dr(m_name, sj_csv, n_sj)
+        extract_nii_dr(m_name, sj_csv, n_sj, save_dir)
     
 def load_mask(img_data):
     """load mask and return mask"""
@@ -67,12 +71,19 @@ def load_mask(img_data):
     mask_dat = nib.load(mask_path).get_fdata()>0
     return mask_dat
 
-def extract_nii_dr(m_name, sj_csv, n_sj):
+def extract_nii_dr(m_name, sj_csv, n_sj, save_dir=None):
     curr_dir = '/well/seymour/users/uhu195/python/extract_npy'
     data_dir = '/well/win-biobank/projects/imaging/data/data3/subjectsAll'
     
     dff = pd.read_csv(os.path.join(curr_dir, 'bmrc_full', sj_csv))
-    
+    # save
+    dir_name = sj_csv.split('.')[0]
+    if save_dir is None:
+        save_dir = os.path.join(curr_dir,'npy',dir_name)
+    else:
+        save_dir = save_dir
+    print(save_dir)
+        
     # load mask
     f_path = os.path.join(data_dir, '2'+str(dff['eid'].iloc[0]), m_name)
     img_tmp = nib.load(f_path).get_fdata()
@@ -96,9 +107,6 @@ def extract_nii_dr(m_name, sj_csv, n_sj):
                 all_m.append(img_rav)
             all_mr = np.vstack(all_m)
 #             print(all_mr.shape)
-            # save
-            dir_name = sj_csv.split('.')[0]
-            save_dir = os.path.join(curr_dir,'npy',dir_name)
 
             save_name = m_name.split('/')[-1].split('.')[0] + f'_{i}.npy'
             save_path = os.path.join(save_dir, save_name)
@@ -144,6 +152,9 @@ if __name__=="__main__":
 #     sj_csv = 'subjs_patients_pain_restricted_matched.csv'
 #     sj_csv = 'subjs_patients_pain.csv'
     ##sj_csv = 'subjs_patients_pain_matched.csv'
-    sj_csv = 'subjs_digestive.csv'
+#     sj_csv = 'subjs_digestive.csv'
+#     sj_csv = 'subjs_patients_pain_exmult.csv'
+    sj_csv = 'subjs_paincontrol.csv'
 
-    extract_nii(mods[mod_num], sj_csv, n_sj=sj_num)
+    shared_dir = '/well/tracey/shared/fps-ukb/'
+    extract_nii(mods[mod_num], sj_csv, n_sj=sj_num, save_dir=shared_dir)
