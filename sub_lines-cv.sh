@@ -14,8 +14,10 @@ source /well/seymour/users/uhu195/python/extract-py3.7.4-${MODULE_CPU_TYPE}/bin/
 
 # continue to use your python venv as normal
 echo "Working on IC number $1"
+# python /well/seymour/users/uhu195/python/extract_npy/compare_paincontrol.py $1 qsidp
 # python /well/seymour/users/uhu195/python/extract_npy/compare_paincontrol.py $1 idp
 # python /well/seymour/users/uhu195/python/extract_npy/compare_paincontrol.py $1 qs
+# python /well/seymour/users/uhu195/python/extract_npy/compare_bfl_qsidp.py $1 qsidp
 # python /well/seymour/users/uhu195/python/extract_npy/compare_bfl_qsidp.py $1 idp
 python /well/seymour/users/uhu195/python/extract_npy/compare_bfl_qsidp.py $1 qs
 # python /well/seymour/users/uhu195/python/extract_npy/extract_mod.py 0 300

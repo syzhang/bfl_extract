@@ -98,14 +98,18 @@ if __name__=="__main__":
 #     df_save.to_csv(os.path.join(curr_dir, 'cv_results', 'paincontrol', f'cv_results_{IC}IC.csv'), index=None)
 
     add_ls = str(sys.argv[2]) # to split up work to different qsub
+    qs_all = ['cognitive','demographic','lifestyle','mental']
+    idp_all = ['t1vols','subcorticalvol','fast','t2star','wdmri','taskfmri']#'dmri','t2weighted',
+
     if add_ls == 'qs':
-        add_all = ['cognitive','demographic','lifestyle','mental']
-        added_ls = combinations_all(add_all)
+        added_ls = combinations_all(qs_all)
         idp_in = None
-    else:
-        add_all = ['t1vols','subcorticalvol','fast','t2star','wdmri','taskfmri']#'dmri','t2weighted',
-        added_ls = combinations_all(add_all)
+    elif add_ls == 'idp':
+        added_ls = combinations_all(idp_all)
         qs_in = None
+    else: #qsidp
+        add_all = ['t1vols', 'wdmri', 'taskfmri', 'demographic', 'lifestyle', 'mental']
+        added_ls = combinations_all(add_all)
     
     
     cv_res = []
@@ -119,8 +123,18 @@ if __name__=="__main__":
             
         if add_ls == 'qs':
             qs_in = feat_in
-        else:
+        elif add_ls == 'idp':
             idp_in = feat_in
+        else: #qsidp
+            if feat_in != None:
+                qs_in, idp_in = [], []
+                for i in feat_in:
+                    if i in qs_all:
+                        qs_in.append(i)
+                    elif i in idp_all:
+                        idp_in.append(i)
+            else:
+                qs_in, idp_in = None, None
 
         print(f'Currently running - bestIC={IC}, qs_ls={qs_in}, idp_ls={idp_in}')
         df_cv = cv_loop(IC, qs_in, idp_in)
