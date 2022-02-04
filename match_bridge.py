@@ -7,7 +7,7 @@ import pandas as pd
 
 def convert_eid(df_bridge, in_csv, save=False):
     """convert eid to bmrc ones"""
-    df_subjs = pd.read_csv('./subjs/'+in_csv, header=None)
+    df_subjs = pd.read_csv('./subjs/'+in_csv, header=None, dtype=int)
     df_slice = df_subjs.merge(df_bridge, left_on=0, right_on='eid_45465')
     # df_slice = df_bridge[df_subjs[0].isin(df_bridge['eid_45465'])]
     df_bmrs = df_slice['eid_8107']
