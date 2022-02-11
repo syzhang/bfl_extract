@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#$ -q short.qc@@short.hga
-#$ -pe shmem 10
+#$ -q short.qc
+#$ -pe shmem 22
 #$ -o /well/seymour/users/uhu195/python/shoes/
 #$ -e /well/seymour/users/uhu195/python/shoes/
 
@@ -17,6 +17,8 @@ echo "Working on modality $1"
 python /well/seymour/users/uhu195/python/extract_npy/extract_mod.py $1 
 # python /well/seymour/users/uhu195/python/extract_npy/extract_mod.py 0 300
 
+
+################# use the following loop in shell to submit all modalities
 # sub loop
 # for mod_num in {0..20}
 # do

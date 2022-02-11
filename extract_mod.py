@@ -8,6 +8,7 @@ import nibabel as nib
 
 
 def extract_nii(m_name, sj_csv, n_sj=2, save_dir=None):
+    "extract imaging nii files and save to numpy arrays"
     all_m = []
     curr_dir = '/well/seymour/users/uhu195/python/extract_npy'
     data_dir = '/well/win-biobank/projects/imaging/data/data3/subjectsAll'
@@ -72,6 +73,7 @@ def load_mask(img_data):
     return mask_dat
 
 def extract_nii_dr(m_name, sj_csv, n_sj, save_dir=None):
+    "loop through each of dr imaging files and save to npy"
     curr_dir = '/well/seymour/users/uhu195/python/extract_npy'
     data_dir = '/well/win-biobank/projects/imaging/data/data3/subjectsAll'
     
@@ -148,13 +150,17 @@ if __name__=="__main__":
         'fMRI/rfMRI_25.dr/dr_stage2.nii.gz'
     ]
     
+    
+    ############### change the subject file to match one in bmrc_full folder
     ## sj_csv = 'subjs_patients_pain_restricted.csv'
 #     sj_csv = 'subjs_patients_pain_restricted_matched.csv'
 #     sj_csv = 'subjs_patients_pain.csv'
     ##sj_csv = 'subjs_patients_pain_matched.csv'
 #     sj_csv = 'subjs_digestive.csv'
 #     sj_csv = 'subjs_patients_pain_exmult.csv'
-    sj_csv = 'subjs_paincontrol.csv'
+#     sj_csv = 'subjs_paincontrol.csv'
+    sj_csv = 'subjs_painquestion.csv'
 
+    ############### change shared_dir below to save output npys (need a lot of space)
     shared_dir = '/well/tracey/shared/fps-ukb/'
     extract_nii(mods[mod_num], sj_csv, n_sj=sj_num, save_dir=shared_dir)

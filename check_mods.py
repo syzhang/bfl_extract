@@ -1,5 +1,5 @@
 """
-check if subject has all modalities
+check if subject has all modalities (taking in subjects in bmrc_subjs and check if they have all modalities, then saved to bmrc_full)
 """
 import os
 import numpy as np
@@ -18,7 +18,7 @@ def check_mods(sj_csv):
                 count += 1
         if count == len(mods):
             full_sj.append(sj)
-#             print(f'subject {sj} has {count} modalities.')
+            print(f'subject {sj} has {count} modalities.')
     df_full = pd.DataFrame({'eid':full_sj})
     print(df_full.shape)
     df_full.to_csv('./bmrc_full/'+sj_csv,index=None)
@@ -54,8 +54,11 @@ if __name__=="__main__":
     'T2_FLAIR/lesions/final_mask_to_MNI.nii.gz'
     ]
     
-    # check
-    for f in os.listdir('./bmrc_subjs'):
-        if f.endswith('.csv'):
-            print(f)
-            check_mods(f)
+    # check all files
+#     for f in os.listdir('./bmrc_subjs'):
+#         if f.endswith('.csv'):
+#             print(f)
+#             check_mods(f)
+    
+    # check specific file
+    check_mods('subjs_painquestion.csv')
