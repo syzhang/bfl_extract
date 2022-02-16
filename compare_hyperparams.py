@@ -414,6 +414,27 @@ def best_clf(param_csv, bfloutput_dir, curr_dir='/well/seymour/users/uhu195/pyth
         print(f'modality {mod}')
         reshape_z, mask_path = load_modZ(data_dir, modality_num=mod, feature_num=top_feat, plot_threshold=40)
 
+def load_cv(cv_dir, qtype='all'):
+    """load cv results"""
+    cv_ls = []
+
+    if qtype=='idp':
+        end_name = '_idp.csv'
+    elif qtype=='qs':
+        end_name = '_qs.csv'
+    elif qtype=='qsidp':
+        end_name = '_qsidp.csv'
+    else:
+        end_name = '.csv'
+        
+    for f in os.listdir(cv_dir):
+        if f.endswith(end_name):	
+            tmp = pd.read_csv(os.path.join(cv_dir, f))
+            cv_ls.append(tmp)
+    df = pd.concat(cv_ls)
+    print(df.head())
+    return df
+
 
 # run
 if __name__=="__main__":

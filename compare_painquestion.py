@@ -1,5 +1,5 @@
 """
-compare pain vs control dataset cross validation
+compare pain vs no pain with questionnaire data cross validation
 """
 
 import os, sys
@@ -12,16 +12,16 @@ import optuna
 from compare_hyperparams import load_feats, full_labels, remove_subjs, objective, feature_importance, cv_classify
 from compare_bfl_qsidp import proc_qsidp, load_qscode, combinations_all
 
-def make_data_paincontrol(bestIC, qs_ls='all', idp_ls='all'):
-    bfloutput_dir='/well/tracey/shared/fps-ukb/bigflica_output/output_paincontrol_500/'
+def make_data_painquestion(bestIC, qs_ls='all', idp_ls='all'):
+    bfloutput_dir='/well/tracey/shared/fps-ukb/bigflica_output/output_painquestion_500/'
     curr_dir = '/well/seymour/users/uhu195/python/extract_npy'
     d = f'Result_IC{bestIC}'
     data_dir = os.path.join(bfloutput_dir, d)
-    df_out = pd.read_csv(os.path.join(curr_dir, 'labels_full', 'label_paincontrol.csv'))
+    df_out = pd.read_csv(os.path.join(curr_dir, 'labels_full', 'label_painquestion.csv'))
     df_featout_ex = remove_subjs(data_dir, df_out, remove_dup=False)
     # load qsidp (section to match bfl, impute, dummify)
     if qs_ls is not None or idp_ls is not None:
-        df_qsidp = pd.read_csv(os.path.join(curr_dir,'qsidp','qsidp_paincontrol.csv'))
+        df_qsidp = pd.read_csv(os.path.join(curr_dir,'qsidp','qsidp_painquestion.csv'))
         df_qs_imputed_dum = proc_qsidp(df_qsidp, df_featout_ex, questionnaire=qs_ls, idp=idp_ls)
         print(f'df_qs_imputed_dum shape={df_qs_imputed_dum.shape}')
         # merge bfl and qsidp
@@ -61,7 +61,7 @@ def objective(trial, X, y):
 def fit_bp(bestIC, qs_ls, idp_ls, feat_scaler=True, feat_balance=True, fit_n=30):
     """fit best params using optuna"""
     # load bfl
-    df_bfl_qsidp = make_data_paincontrol(bestIC, qs_ls=qs_ls, idp_ls=idp_ls)
+    df_bfl_qsidp = make_data_painquestion(bestIC, qs_ls=qs_ls, idp_ls=idp_ls)
     # retrain params
     X_train, y_train, X_valid, y_valid = load_feats(df_bfl_qsidp, bestIC, test_size=0.25, dummies=False,
                                   train=True, balance=feat_balance, scaler=feat_scaler)
@@ -74,7 +74,7 @@ def fit_bp(bestIC, qs_ls, idp_ls, feat_scaler=True, feat_balance=True, fit_n=30)
 def cv_loop(bestIC, qs_ls, idp_ls, feat_scaler=True, feat_balance=True, fit_n=30):
     """cv loop of all possible input combinations"""
     # load bfl
-    df_bfl_qsidp = make_data_paincontrol(bestIC, qs_ls=qs_ls, idp_ls=idp_ls)
+    df_bfl_qsidp = make_data_painquestion(bestIC, qs_ls=qs_ls, idp_ls=idp_ls)
     # retrain params
     X_train, y_train, X_valid, y_valid = load_feats(df_bfl_qsidp, bestIC, test_size=0.25, dummies=False,
                                   train=True, balance=feat_balance, scaler=feat_scaler)
@@ -143,6 +143,6 @@ if __name__=="__main__":
         cv_res.append(df_cv)
                 
     df_save = pd.concat(cv_res)
-    df_save.to_csv(os.path.join(curr_dir, 'cv_results', 'paincontrol', f'cv_results_{IC}IC_{add_ls}.csv'), index=None)
+    df_save.to_csv(os.path.join(curr_dir, 'cv_results', 'painquestion', f'cv_results_{IC}IC_{add_ls}.csv'), index=None)
     
     
