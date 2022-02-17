@@ -20,6 +20,6 @@
 
 ### classifier training and testing
 * `qsidp` directory contains questionnaire and IDP data copied over from jalapeno (use sftp to move IDP data from japapeno to bmrc if needed)
-* Notebook `dev_paincontrol.ipynb` shows the pipeline development for pain vs no pain control classification
-* Notebook `dev_paintype.ipynb` contains pipeline for disease classifcation 
-* Notebook `dev_painquestion.ipynb` shows the pipeline development for pain questionnaire based classification
+* `compare_paincontrol.py` runs pain vs no pain control classification cross validation (submit jobs), notebook `dev_paincontrol.ipynb` shows the pipeline results and important features
+* `compare_paintype.py` runs disease classification cross validation, notebook `dev_paintype.ipynb` contains pipeline for result and feature visualisation
+* `compare_painquestion.py` runs pain vs no pain classification based on pain questionnaire data, `dev_painquestion.ipynb` shows the pipeline for feature visualisation
