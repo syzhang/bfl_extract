@@ -45,47 +45,34 @@ def remove_subjs(feat_path, df_label, remove_dup=True):
         df_featout_ex = pd.concat([df_label, pd.DataFrame(feats)], axis=1)
     return df_featout_ex
 
-# def data_prep(df, IC_num):
-#     """prepare df to x and y for clf"""
-#     # dummify labels
-#     try:
-#         X = df[(str(n) for n in range(0,IC_num))].to_numpy()
-#     except:
-#         X = df[(n for n in range(0,IC_num))].to_numpy()
-
-# #     if df.shape[1]>33:
-#     if 'label' in df.columns:
-#         y = df['label']
-#     else:
-#         y_original = df[['irritable bowel syndrome', 'migraine', 'back pain',
-#        'osteoarthritis']]
-#         y = y_original.idxmax(axis=1)
-#     return X, y
-
-def data_prep(df, IC_num):
+def data_prep(df):
     """prepare df to x and y for clf"""
     # dummify labels
     dfc = df.copy()
-    try:
-        X = dfc.drop(columns=['irritable bowel syndrome', 'migraine', 'back pain',
-       'osteoarthritis', 'eid', 'bmrc']).to_numpy()
-    except:
-        X = dfc.drop(columns=['label', 'eid', 'bmrc']).to_numpy()
+    rm_cols = ['irritable bowel syndrome', 'migraine', 'back pain', 'osteoarthritis', 'label', 'eid', 'bmrc']
+    rm_idx = [item in df.columns for item in rm_cols]
+    rm_colnames = [item for idx, item in enumerate(rm_cols) if rm_idx[idx]]
+    
+    # remove redundant cols in X
+    if len(rm_colnames)>0:
+        X = dfc.drop(columns=rm_colnames).to_numpy()
+    else:
+        X = dfc.to_numpy()
     print(X.shape)
-#     if df.shape[1]>33:
+
+    # take labels out
     if 'label' in df.columns:
         y = df['label']
     else:
-        y_original = df[['irritable bowel syndrome', 'migraine', 'back pain',
-       'osteoarthritis']]
+        y_original = df[['irritable bowel syndrome', 'migraine', 'back pain', 'osteoarthritis']]
         y = y_original.idxmax(axis=1)
     return X, y
 
-def cv_classify(df, IC_num, classifier='dtree', tuned_params=None, cv_fold=10, scaler=True, balance=True):
+def cv_classify(df, classifier='dtree', tuned_params=None, cv_fold=10, scaler=True, balance=True):
     """n-fold cross validation classification"""
     from sklearn.model_selection import cross_validate
 
-    X, y = data_prep(df, IC_num)
+    X, y = data_prep(df)
     # balance dataset
     if balance:
         from imblearn.under_sampling import RandomUnderSampler
@@ -233,11 +220,11 @@ def objective(trial, X, y):
     accuracy = score.mean()
     return accuracy
 
-def load_feats(data, IC_num, test_size=0.5, dummies=False, 
+def load_feats(data, test_size=0.5, dummies=False, 
                train=True, balance=False, scaler=False):
     """load dataset from csv, return full or train sets"""
     # prep by renaming columns and split xy
-    X, y = data_prep(data, IC_num=IC_num)
+    X, y = data_prep(data)
     
     # balance dataset
     if balance:
