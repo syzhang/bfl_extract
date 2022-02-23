@@ -94,8 +94,10 @@ if __name__=="__main__":
     IC = int(sys.argv[1]) # to split up work to different qsub
     
     add_ls = str(sys.argv[2]) # to split up work to different qsub
-    qs_all = ['cognitive','demographic','lifestyle','mental']
-    idp_all = ['t1vols','subcorticalvol','fast','t2star','wdmri','taskfmri']#'dmri','t2weighted',
+#     qs_all = ['cognitive','demographic','lifestyle','mental']
+#     idp_all = ['t1vols','subcorticalvol','fast','t2star','wdmri','taskfmri']#'dmri','t2weighted',
+    qs_all = ['cognitive','demographic','lifestyle']
+    idp_all = ['t1vols','taskfmri']#'dmri','t2weighted',
 
     if add_ls == 'qs':
         added_ls = combinations_all(qs_all)
@@ -104,7 +106,7 @@ if __name__=="__main__":
         added_ls = combinations_all(idp_all)
         qs_in = None
     elif add_ls == 'qsidp':
-        add_all = ['t2star', 'taskfmri', 'lifestyle', 'mental']
+        add_all = ['cognitive', 'demographic', 'lifestyle', 't1vols', 'taskfmri']
         added_ls = combinations_all(add_all)
     else: #using qsidp without bfl output
         add_all = qs_all + idp_all

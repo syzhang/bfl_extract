@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #$ -q short.qc@@short.hga
-#$ -pe shmem 1
+#$ -pe shmem 3
 #$ -o /well/seymour/users/uhu195/python/shoes/
 #$ -e /well/seymour/users/uhu195/python/shoes/
 
@@ -22,10 +22,10 @@ echo "Working on IC number $1"
 # python /well/seymour/users/uhu195/python/extract_npy/compare_paincontrol.py $1 qs
 # python /well/seymour/users/uhu195/python/extract_npy/compare_paincontrol.py $1 idp
 # python /well/seymour/users/uhu195/python/extract_npy/compare_paincontrol.py $1 qsidp
-python /well/seymour/users/uhu195/python/extract_npy/compare_paincontrol.py $1 nobfl
+# python /well/seymour/users/uhu195/python/extract_npy/compare_paincontrol.py $1 nobfl
 
 # python /well/seymour/users/uhu195/python/extract_npy/compare_paintype.py $1 qs
 # python /well/seymour/users/uhu195/python/extract_npy/compare_paintype.py $1 idp
-# python /well/seymour/users/uhu195/python/extract_npy/compare_paintype.py $1 qsidp
+python /well/seymour/users/uhu195/python/extract_npy/compare_paintype.py $1 qsidp
 # python /well/seymour/users/uhu195/python/extract_npy/compare_paintype.py $1 nobfl
 
