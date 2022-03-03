@@ -14,12 +14,13 @@ from compare_bfl_qsidp import proc_qsidp, load_qscode, combinations_all
 from compare_painquestion import sum_results, regroup_ls
 
 def make_data_paintype(bestIC, qs_ls='all', idp_ls='all'):
-    bfloutput_dir='/well/seymour/users/uhu195/python/pain/output_patients_500'
+    bfloutput_dir='/well/tracey/shared/fps-ukb/bigflica_output/output_paintype_500/'
     curr_dir = '/well/seymour/users/uhu195/python/extract_npy'
     d = f'Result_IC{bestIC}'
     data_dir = os.path.join(bfloutput_dir, d)
     # load labels
-    df_label = pd.read_csv(os.path.join(curr_dir, 'labels_full', 'label_patients_pain.csv'))
+#     df_label = pd.read_csv(os.path.join(curr_dir, 'labels_full', 'label_patients_pain.csv'))
+    df_label = pd.read_csv(os.path.join(curr_dir, 'labels_full', 'label_paintype.csv'))
     # load qsidp (section to match bfl, impute, dummify)
     if bestIC==0:
         df_qsidp = pd.read_csv(os.path.join(curr_dir,'qsidp','qsidp_patients_pain.csv'))
@@ -94,10 +95,10 @@ if __name__=="__main__":
     IC = int(sys.argv[1]) # to split up work to different qsub
     
     add_ls = str(sys.argv[2]) # to split up work to different qsub
-#     qs_all = ['cognitive','demographic','lifestyle','mental']
-#     idp_all = ['t1vols','subcorticalvol','fast','t2star','wdmri','taskfmri']#'dmri','t2weighted',
-    qs_all = ['cognitive','demographic','lifestyle']
-    idp_all = ['t1vols','taskfmri']#'dmri','t2weighted',
+    qs_all = ['cognitive','demographic','lifestyle','mental']
+    idp_all = ['t1vols','subcorticalvol','fast','t2star','wdmri','taskfmri']#'dmri','t2weighted',
+#     qs_all = ['cognitive','demographic','lifestyle']
+#     idp_all = ['t1vols','taskfmri']#'dmri','t2weighted',
 
     if add_ls == 'qs':
         added_ls = combinations_all(qs_all)

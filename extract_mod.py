@@ -159,7 +159,8 @@ if __name__=="__main__":
 #     sj_csv = 'subjs_digestive.csv'
 #     sj_csv = 'subjs_patients_pain_exmult.csv'
 #     sj_csv = 'subjs_paincontrol.csv'
-    sj_csv = 'subjs_painquestion.csv'
+#     sj_csv = 'subjs_painquestion.csv'
+    sj_csv = 'subjs_paintype.csv'
 
     ############### change shared_dir below to save output npys (need a lot of space)
     shared_dir = '/well/tracey/shared/fps-ukb/'

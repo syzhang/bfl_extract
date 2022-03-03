@@ -78,7 +78,7 @@ if __name__=="__main__":
         added_ls = combinations_all(idp_all)
         qs_in = None
     elif add_ls == 'qsidp':
-        add_all = ['t2star', 'taskfmri', 'lifestyle', 'mental']
+        add_all = ['t2star', 'taskfmri', 'cognitive','lifestyle', 'mental']
         added_ls = combinations_all(add_all)
     else: #using qsidp without bfl output
         add_all = qs_all + idp_all

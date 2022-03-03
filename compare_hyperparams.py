@@ -315,27 +315,26 @@ def feature_importance(clf, feature_names,
             plt.savefig(os.path.join(curr_dir, 'figs', f'feature_importance_IC{len(feature_names)}.png'), bbox_inches='tight')
     return feat_importances.sort_values(ascending=False)
 
-def top_mods(data_dir, feature_importance, mod_num=3, plot=True, save_plot=True,
-            curr_dir='/well/seymour/users/uhu195/python/extract_npy'):
+def top_mods(data_dir, top_feat, mod_num=3, plot=True):
     """return top modalities given feature importance"""
     mod_contrib = np.load(os.path.join(data_dir, 'mod_contribution.npy')) # mod x feats
-    top_feat = int(feature_importance.index[0].split(' ')[1])
+#     top_feat = int(feature_importance.index[0].split(' ')[1])
     print(f'top feature: {top_feat}')
     topIC = mod_contrib[:,top_feat]
+    sorted_idx = topIC.argsort()[::-1]
     # load mod names
-    mod_names = pd.read_csv(os.path.join(curr_dir, 'sorted_feats.csv'))
-    plot_mod = mod_names.iloc[topIC.argsort()]
-#     print(plot_mod.index.max())
-    print('top modalities', plot_mod.iloc[-mod_num:])
+    mod_names = pd.read_csv('./sorted_feats.csv')
+    plot_mod = mod_names.iloc[sorted_idx]
     if plot:
+        plotIC = topIC[sorted_idx[:mod_num]]
+        plot_mod_names = plot_mod['modalities'].iloc[:mod_num]
         import matplotlib.pyplot as plt
-        plt.subplots(figsize=(8,4))
-        plt.bar(np.arange(len(topIC)), topIC[topIC.argsort()])
-        plot_mod_names = plot_mod['modalities'].values
+        plt.subplots(figsize=(4,3))
+        plt.bar(np.arange(len(plotIC)), plotIC)
         plt.xticks(np.arange(len(plot_mod_names)), plot_mod_names, rotation=90)
-        if save_plot:
-            plt.savefig(os.path.join(curr_dir, 'figs', f'topfeature_{top_feat}_modsrank.png'), bbox_inches='tight')
-    return top_feat, plot_mod.index[-mod_num:].values[::-1]
+        plt.xlabel('Imaging modality')
+        plt.ylabel('Modality contribution')
+    return top_feat, sorted_idx
 
 def load_modZ(data_dir, modality_num, feature_num, plot_threshold, 
               plot_coords=[0, 0, 0], plot=True, save_plot=True,
@@ -370,6 +369,55 @@ def load_modZ(data_dir, modality_num, feature_num, plot_threshold,
             plt.savefig(os.path.join(curr_dir, 'figs', f'mod_{plot_mod[0]}.png'), bbox_inches='tight')
     return img_reshape_ni, mask_path
 
+def load_modZ_multi(data_dir, modality_ls, feature_num, plot_threshold, plot_num=4,
+              plot_coords=[0, 0, 0], plot=True, save_plot=True, save_name='paincontrol_blf.png',
+              curr_dir='/well/seymour/users/uhu195/python/extract_npy'):
+    """load modality Z map given number"""
+    import nibabel as nib
+    from nibabel import Nifti1Image
+    from nilearn.plotting import plot_stat_map
+    import matplotlib.pyplot as plt
+
+    fig, ax = plt.subplots(plot_num, 1, figsize=(10, 3*plot_num))
+    for n, modality_num in enumerate(modality_ls[:plot_num]):
+        df_mod = np.load(os.path.join(data_dir, f'flica_mod{modality_num+1}_Z.npy'))
+        print(df_mod.shape)
+        img_data = df_mod[:,feature_num]
+        # load mask by shape
+        if df_mod.shape[0]>1e6:
+            mask_path = os.path.join(curr_dir, 'MNI152_T1_1mm_brain.nii.gz')
+        else:
+            mask_path = os.path.join(curr_dir, 'MNI152_T1_2mm_brain.nii.gz')
+        mask_img = nib.load(mask_path)
+        mask_data = mask_img.get_fdata()
+        mask = np.where(mask_data>0)
+        # reshape z map
+        img_reshape = np.zeros(mask_data.shape)
+        img_reshape[mask] = img_data
+        # reconstruct using MNI affine
+        img_reshape_ni = Nifti1Image(img_reshape, affine=mask_img.affine)
+        # load modality names
+        mod_names = pd.read_csv(os.path.join(curr_dir, 'sorted_feats.csv'))
+        # plotting
+        if plot:
+            ax = plt.subplot(plot_num, 1, n+1)
+            plot_mod = mod_names.iloc[modality_num].values
+            plot_stat_map(img_reshape_ni, bg_img=mask_path, threshold=plot_threshold, 
+                          cut_coords=plot_coords, title=plot_mod[0], axes=ax)
+        if save_plot:
+            plt.savefig(os.path.join(curr_dir, 'figs', save_name), bbox_inches='tight', dpi=200)
+
+def print_clf_table(df, n=3):
+    """print classifier performance top n"""
+    df_show = df.iloc[df['balanced_accuracy'].sort_values(ascending=False).index[:n]][['qsidp','bestIC','balanced_accuracy','roc_auc']]
+    df_show['qsidp'] = df_show.qsidp.str.replace(']', '', regex=False)
+    df_show['qsidp'] = df_show.qsidp.str.replace('[', '', regex=False)
+    df_show.rename(columns={'qsidp': 'Feature items', 
+                            'bestIC': 'Imaging components', 
+                            'balanced_accuracy': 'Balanced accuracy',
+                           'roc_auc': 'ROC AUC'}, inplace=True)
+    print(df_show.to_latex(index=False, float_format="{:0.3f}".format))
+            
 def best_clf(param_csv, bfloutput_dir, curr_dir='/well/seymour/users/uhu195/python/extract_npy'):
     """build best clf from optuna params"""
     from sklearn.ensemble import RandomForestClassifier
